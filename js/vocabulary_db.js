@@ -1,478 +1,122 @@
 const vocabulary_db = [
   {
-    "germenWord": "wie",
-    "englishWord": "how"
+    "germenWord": "Theater spielen",
+    "englishWord": "act in a play"
   },
   {
-    "germenWord": "wer",
-    "englishWord": "who"
+    "germenWord": "die Burg",
+    "englishWord": "castle"
   },
   {
-    "germenWord": "Person",
-    "englishWord": "person"
+    "germenWord": "die Fotografie",
+    "englishWord": "photography"
   },
   {
-    "germenWord": "Süßigkeiten",
-    "englishWord": "sweets"
+    "germenWord": "sportlich",
+    "englishWord": "sporty"
   },
   {
-    "germenWord": "Wand, Mauer",
-    "englishWord": "wall"
+    "germenWord": "Ich werde ... auswählen",
+    "englishWord": "I'm going to choose ..."
   },
   {
-    "germenWord": "mein eigenes Zimmer",
-    "englishWord": "my own room"
+    "germenWord": "die Kamera",
+    "englishWord": "camera"
   },
   {
-    "germenWord": "Problem",
-    "englishWord": "problem"
+    "germenWord": "schrecklich",
+    "englishWord": "terrible"
   },
   {
-    "germenWord": "Eltern",
-    "englishWord": "perents"
+    "germenWord": "heute Nacht",
+    "englishWord": "tonight"
   },
   {
-    "germenWord": "natürlich, selbstverständlich",
-    "englishWord": "of course"
+    "germenWord": "die Verabredung",
+    "englishWord": "date"
   },
   {
-    "germenWord": "sprechen",
-    "englishWord": "speak"
+    "germenWord": "irgendwo",
+    "englishWord": "somewhere"
   },
   {
-    "germenWord": "später",
-    "englishWord": "later"
+    "germenWord": "der Kalender",
+    "englishWord": "calendar"
   },
   {
-    "germenWord": "Abendessen",
-    "englishWord": "dinner"
+    "germenWord": "klassisch",
+    "englishWord": "classical"
   },
   {
-    "germenWord": "unhöflich",
-    "englishWord": "rude"
+    "germenWord": "beliebt",
+    "englishWord": "popular"
   },
   {
-    "germenWord": "klein",
-    "englishWord": "little"
+    "germenWord": "lauter als",
+    "englishWord": "louder than"
   },
   {
-    "germenWord": "der Teil von",
-    "englishWord": "part of"
+    "germenWord": "der/die/das letzte",
+    "englishWord": "the last one"
   },
   {
-    "germenWord": "zurück",
-    "englishWord": "back"
+    "germenWord": "der Liedtext",
+    "englishWord": "lyrics"
   },
   {
-    "germenWord": "Geräusch, Lärm",
-    "englishWord": "noise"
+    "germenWord": "aktiv, tatkräftig",
+    "englishWord": "energetic"
   },
   {
-    "germenWord": "Idee",
-    "englishWord": "idea"
+    "germenWord": "besser",
+    "englishWord": "better"
   },
   {
-    "germenWord": "wichtig",
-    "englishWord": "important"
+    "germenWord": "schlechter",
+    "englishWord": "worse"
   },
   {
-    "germenWord": "lang",
-    "englishWord": "long"
+    "germenWord": "so gut wie",
+    "englishWord": "as good as"
   },
   {
-    "germenWord": "buchstabieren",
-    "englishWord": "spell"
+    "germenWord": "der Arzt",
+    "englishWord": "doctor"
   },
   {
-    "germenWord": "Adresse",
-    "englishWord": "address"
+    "germenWord": "etwas bewerten",
+    "englishWord": "to rate something"
   },
   {
-    "germenWord": "so, auf diese Art",
-    "englishWord": "like this"
+    "germenWord": "die Auswirkung auf",
+    "englishWord": "effect on"
   },
   {
-    "germenWord": "schreiben",
-    "englishWord": "write"
+    "germenWord": "der/die/das schlechteste",
+    "englishWord": "the worst"
   },
   {
-    "germenWord": "etwas präsentieren",
-    "englishWord": "present sth."
+    "germenWord": "der Raum, der Platz; der Weltraum",
+    "englishWord": "space"
   },
   {
-    "germenWord": "einzelne",
-    "englishWord": "singel"
+    "germenWord": "der Charakter",
+    "englishWord": "character"
   },
   {
-    "germenWord": "Hin- und Rückfahrkarte",
-    "englishWord": "return ticket"
+    "germenWord": "der Außerirdische",
+    "englishWord": "alien"
   },
   {
-    "germenWord": "sie gingen nicht",
-    "englishWord": "they did not go"
+    "germenWord": "der Krieg",
+    "englishWord": "war"
   },
   {
-    "germenWord": "Fahne",
-    "englishWord": "flag"
+    "germenWord": "stattfinden",
+    "englishWord": "take place"
   },
   {
-    "germenWord": "sogar wenn, selbst wenn",
-    "englishWord": "even if"
+    "germenWord": "die Zeitschrift",
+    "englishWord": "magazine"
   },
-  {
-    "germenWord": "die Gegend, der Bereich",
-    "englishWord": "area"
-  },
-  {
-    "germenWord": "still, lautlos",
-    "englishWord": "silent"
-  },
-  {
-    "germenWord": "die Flasche",
-    "englishWord": "bottle"
-  },
-  {
-    "germenWord": "sicher",
-    "englishWord": "safe"
-  },
-  {
-    "germenWord": "ausleihen",
-    "englishWord": "borrow"
-  },
-  {
-    "germenWord": "letzte",
-    "englishWord": "last"
-  },
-  {
-    "germenWord": "schmecken, probieren",
-    "englishWord": "taste"
-  },
-  {
-    "germenWord": "abhängen",
-    "englishWord": "hang out"
-  },
-  {
-    "germenWord": "morgen",
-    "englishWord": "tomorrow"
-  },
-  {
-    "germenWord": "suchen, Ausschau halten nach",
-    "englishWord": "look for"
-  },
-  {
-    "germenWord": "warten auf",
-    "englishWord": "wait for"
-  },
-  {
-    "germenWord": "Ich war",
-    "englishWord": "I was"
-  },
-  {
-    "germenWord": "Sie waren",
-    "englishWord": "they were"
-  },
-  {
-    "germenWord": "Ausflug, Reise",
-    "englishWord": "trip"
-  },
-  {
-    "germenWord": "Wir waren",
-    "englishWord": "we were"
-  },
-  {
-    "germenWord": "Ich war nicht",
-    "englishWord": "I was not"
-  },
-  {
-    "germenWord": "Wir waren nicht",
-    "englishWord": "We were not"
-  },
-  {
-    "germenWord": "Hauptstadt",
-    "englishWord": "capital"
-  },
-  {
-    "germenWord": "der Berg",
-    "englishWord": "mountain"
-  },
-  {
-    "germenWord": "ein bisschen, ein wenig",
-    "englishWord": "a bit"
-  },
-  {
-    "germenWord": "bleiben, übernachten",
-    "englishWord": "stay"
-  },
-  {
-    "germenWord": "die Fähre",
-    "englishWord": "ferry"
-  },
-  {
-    "germenWord": "das Flugzeug",
-    "englishWord": "plane"
-  },
-  {
-    "germenWord": "sonnenbaden",
-    "englishWord": "sunbathe"
-  },
-  {
-    "germenWord": "der Fuß",
-    "englishWord": "foot"
-  },
-  {
-    "germenWord": "die Füße",
-    "englishWord": "feet"
-  },
-  {
-    "germenWord": "der Hügel",
-    "englishWord": "hill"
-  },
-  {
-    "germenWord": "die Bildunterschrift",
-    "englishWord": "caption"
-  },
-  {
-    "germenWord": "jemanden zustimmen",
-    "englishWord": "agree with"
-  },
-  {
-    "germenWord": "korrekt",
-    "englishWord": "correct"
-  },
-  {
-    "germenWord": "fahren",
-    "englishWord": "drive"
-  },
-  {
-    "germenWord": "das Feuerwehrauto",
-    "englishWord": "fire engine"
-  },
-  {
-    "germenWord": "die Polizei",
-    "englishWord": "police"
-  },
-  {
-    "germenWord": "das Versprechen",
-    "englishWord": "promise"
-  },
-  {
-    "germenWord": "klettern",
-    "englishWord": "climb"
-  },
-  {
-    "germenWord": "wagen, sich trauen",
-    "englishWord": "dare"
-  },
-  {
-    "germenWord": "sich kleiden, sich anziehen",
-    "englishWord": "dress"
-  },
-  {
-    "germenWord": "jemanden einer Sache ins Gesicht",
-    "englishWord": "face"
-  },
-  {
-    "germenWord": "kämpfen",
-    "englishWord": "fight"
-  },
-  {
-    "germenWord": "enden, zu Ende machen",
-    "englishWord": "finish"
-  },
-  {
-    "germenWord": "Witze machen",
-    "englishWord": "joke"
-  },
-  {
-    "germenWord": "springen",
-    "englishWord": "jump"
-  },
-  {
-    "germenWord": "landen",
-    "englishWord": "land"
-  },
-  {
-    "germenWord": "lachen",
-    "englishWord": "laugh"
-  },
-  {
-    "germenWord": "versprechen",
-    "englishWord": "promise"
-  },
-  {
-    "germenWord": "schockieren",
-    "englishWord": "shock"
-  },
-  {
-    "germenWord": "etwas herausfinden",
-    "englishWord": "work sth. out"
-  },
-  {
-    "germenWord": "der Mut, die Tapferkeit",
-    "englishWord": "bravery"
-  },
-  {
-    "germenWord": "das Glück",
-    "englishWord": "happiness"
-  },
-  {
-    "germenWord": "der falsche Freund",
-    "englishWord": "false friend"
-  },
-  {
-    "germenWord": "der Wissenschaftler",
-    "englishWord": "scientist"
-  },
-  {
-    "germenWord": "der Moderator",
-    "englishWord": "presenter"
-  },
-  {
-    "germenWord": "der Sportler",
-    "englishWord": "sportsperson"
-  },
-  {
-    "germenWord": "die Tatsache",
-    "englishWord": "fact"
-  },
-  {
-    "germenWord": "entdecken",
-    "englishWord": "discover"
-  },
-  {
-    "germenWord": "wenigstens",
-    "englishWord": "at least"
-  },
-  {
-    "germenWord": "der Punkt",
-    "englishWord": "point"
-  },
-  {
-    "germenWord": "werden",
-    "englishWord": "become"
-  },
-  {
-    "germenWord": "kommen",
-    "englishWord": "come"
-  },
-  {
-    "germenWord": "fallen",
-    "englishWord": "fall"
-  },
-  {
-    "germenWord": "fühlen",
-    "englishWord": "feel"
-  },
-  {
-    "germenWord": "finden",
-    "englishWord": "find"
-  },
-  {
-    "germenWord": "geben",
-    "englishWord": "give"
-  },
-  {
-    "germenWord": "wachsen",
-    "englishWord": "grow"
-  },
-  {
-    "germenWord": "treffen",
-    "englishWord": "hit"
-  },
-  {
-    "germenWord": "das Theater",
-    "englishWord": "theatre"
-  },
-  {
-    "germenWord": "die Schönheit",
-    "englishWord": "beauty"
-  },
-  {
-    "germenWord": "die Bestie",
-    "englishWord": "beast"
-  },
-  {
-    "germenWord": "die ganze Familie",
-    "englishWord": "all the family"
-  },
-  {
-    "germenWord": "voll",
-    "englishWord": "full"
-  },
-  {
-    "germenWord": "die Seilrutsche",
-    "englishWord": "zip wire"
-  },
-  {
-    "germenWord": "das Ohr",
-    "englishWord": "ear"
-  },
-  {
-    "germenWord": "der Badeanzug",
-    "englishWord": "swimsuit"
-  },
-  {
-    "germenWord": "töten",
-    "englishWord": "kill"
-  },
-  {
-    "germenWord": "das Kleid",
-    "englishWord": "dress"
-  },
-  {
-    "germenWord": "der Unfall",
-    "englishWord": "accident"
-  },
-  {
-    "germenWord": "der Krankenwagen",
-    "englishWord": "ambulance"
-  },
-  {
-    "germenWord": "springen",
-    "englishWord": "jump"
-  },
-  {
-    "germenWord": "die Seite",
-    "englishWord": "side"
-  },
-  {
-    "germenWord": "gefährlich",
-    "englishWord": "dangerous"
-  },
-  {
-    "germenWord": "hoch",
-    "englishWord": "high"
-  },
-  {
-    "germenWord": "schockiert",
-    "englishWord": "shocked"
-  },
-  {
-    "germenWord": "der Knöchel",
-    "englishWord": "ankle"
-  },
-  {
-    "germenWord": "halten, behalten, aufbewahren",
-    "englishWord": "keep"
-  },
-  {
-    "germenWord": "einschlafen",
-    "englishWord": "fall asleep"
-  },
-  {
-    "germenWord": "atmen",
-    "englishWord": "breathe"
-  },
-  {
-    "germenWord": "die Decke (zum zudecken)",
-    "englishWord": "blanket"
-  },
-  {
-    "germenWord": "der Hals",
-    "englishWord": "neck"
-  },
-  {
-    "germenWord": "bestürzt, aufgebracht, verärgert",
-    "englishWord": "upset"
-  },
-];
+]
