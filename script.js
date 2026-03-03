@@ -48,10 +48,10 @@ async function renderQuestion() {
   rendomIndexNum = Math.floor(Math.random() * vocabularyCase.length);
 
 
-  refGermanWord.innerHTML = germanWord;
+  refGermanWord.innerHTML = vocabularyCase[rendomIndexNum].germenWord;
   renderHP()
 
-  done.innerHTML = `Done: ${vocabulary_db.length - vocabularyCase.length} / ${vocabulary_db.length}`;
+  // done.innerHTML = `Done: ${vocabulary_db.length - vocabularyCase.length} / ${vocabulary_db.length}`;
 }
 
 function submitAnswer() {
@@ -62,9 +62,9 @@ function submitAnswer() {
   let refRightAnswer = document.getElementById('rightAnswer');
 
   refMessage.innerHTML = '';
-  if (refEnglishWord.value == vocabularyToBeLearnedCase[rendomIndexNum].englishWord) {
+  if (refEnglishWord.value == vocabularyCase[rendomIndexNum].englishWord) {
     spaceShipShoot(refShipShoot, refMessage, refRightAnswer);
-    vocabularyToBeLearnedCase.splice(rendomIndexNum, 1)
+    vocabularyCase.splice(rendomIndexNum, 1)
   } else {
     invaderShoot(refInvaderShoot, refMessage, rendomIndexNum, refRightAnswer);
   }
@@ -95,8 +95,8 @@ function invaderShoot(invaderShoot, refMessage, rendomIndexNum, refRightAnswer) 
   setTimeout(() => {
     invaderShoot.classList.remove('invader_shoot');
     invaderShoot.style.animation = "";
-    refRightAnswer.innerHTML = `''${vocabularyToBeLearnedCase[rendomIndexNum].germenWord}'' <br> heißt auf englisch:`
-    refMessage.innerHTML = `${vocabularyToBeLearnedCase[rendomIndexNum].englishWord}`;
+    refRightAnswer.innerHTML = `''${vocabularyCase[rendomIndexNum].germenWord}'' <br> heißt auf englisch:`
+    refMessage.innerHTML = `${vocabularyCase[rendomIndexNum].englishWord}`;
     spaceShipHP -= 100;
     if (spaceShipHP == 0) gameOverSeq(refMessage, refRightAnswer);
     renderQuestion();
