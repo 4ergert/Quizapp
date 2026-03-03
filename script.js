@@ -4,12 +4,14 @@ let invaderHP = 300;
 let spaceShipHP = 1000;
 let spaceShipLVL = 1;
 let spaceShipLVLup = 200;
+let firebaseVocabulary;
 let vocabularyCase = [];
+let learnedVocabulary = [];
 
 async function init() {
-  let vocabulary_db = "db1/";
-  let vocabularyResponse = await loadData(vocabulary_db);
-  
+  firebaseVocabulary = "db1/";
+  let vocabularyResponse = await loadData(firebaseVocabulary);
+
   let vocabularyArray = Object.keys(vocabularyResponse);
   for (let i = 1; i < vocabularyArray.length; i++) {
     vocabularyCase.push(
@@ -19,12 +21,11 @@ async function init() {
       }
     )
   }
-  console.log(vocabularyCase[0].englishWord);
   renderQuestion();
 }
 
-async function loadData(vocabulary_db) {
-  let response = await fetch(BASE_URL + vocabulary_db + ".json");
+async function loadData(firebaseVocabulary) {
+  let response = await fetch(BASE_URL + firebaseVocabulary + ".json");
   let vocabularyAsJSON = await response.json();
   return vocabularyAsJSON;
 }
@@ -39,19 +40,16 @@ addEventListener('keydown', (e) => {
 async function renderQuestion() {
   let refGermanWord = document.getElementById('germanWord');
   let refMessage = document.getElementById('message');
-  let done = document.getElementById('done');
+  let refInvaderHP = document.getElementById('invaderHP');
 
   if (vocabularyCase.length == 0) {
+    refInvaderHP.innerHTML = '';
     winSeq(refMessage);
     return;
   }
   rendomIndexNum = Math.floor(Math.random() * vocabularyCase.length);
-
-
   refGermanWord.innerHTML = vocabularyCase[rendomIndexNum].germenWord;
   renderHP()
-
-  // done.innerHTML = `Done: ${vocabulary_db.length - vocabularyCase.length} / ${vocabulary_db.length}`;
 }
 
 function submitAnswer() {
@@ -64,6 +62,7 @@ function submitAnswer() {
   refMessage.innerHTML = '';
   if (refEnglishWord.value == vocabularyCase[rendomIndexNum].englishWord) {
     spaceShipShoot(refShipShoot, refMessage, refRightAnswer);
+    learnedVocabulary.push(vocabularyCase[rendomIndexNum]);
     vocabularyCase.splice(rendomIndexNum, 1)
   } else {
     invaderShoot(refInvaderShoot, refMessage, rendomIndexNum, refRightAnswer);
@@ -109,7 +108,7 @@ function renderHP() {
   let refSpaceShipLVL = document.getElementById('spaceShipLVL')
 
   refSpaceShipHP.innerHTML = spaceShipHP + 'HP';
-  refInvaderHP.innerHTML = invaderHP + 'HP';
+  refInvaderHP.innerHTML = `${vocabularyCase.length}00HP`;
   refSpaceShipLVL.innerHTML = 'LVL ' + spaceShipLVL;
 }
 

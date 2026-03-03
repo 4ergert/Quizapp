@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Quiz App</title>
 
+  <link rel="stylesheet" href="./style/assets.css">
   <link rel="stylesheet" href="./style/standart.css">
   <link rel="stylesheet" href="./style.css">
 
@@ -20,7 +21,7 @@
 
 <body onload="init()">
   <header class="header">
-    <h1 id="done"></h1>
+    <h1>Vocabulary Trainer</h1>
   </header>
 
   <main class="main">
@@ -58,11 +59,16 @@
         Was heißt "<span id="germanWord"></span>" auf english?
       </p>
 
-      <section id="submitSection" class="submit_section">
-        <input id="englishWord" class="input" type="text" placeholder="..........." required>
-        <button class="submit_button" onclick="submitAnswer()">submit</button>
-      </section>
+      <section class="submit_and_menu">
+        <section id="submitSection" class="submit_section">
+          <input id="englishWord" class="input" type="text" placeholder="..........." required>
+          <button class="submit_button" onclick="submitAnswer()">submit</button>
+        </section>
+        <section class="menu">
+          <button class="menu_button" onclick="renderQuestion()">☰</button>
+        </section>
 
+      </section>
     </section>
 
   </main>
