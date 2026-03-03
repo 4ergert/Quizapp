@@ -9,7 +9,9 @@ let vocabularyCase = [];
 let learnedVocabulary = [];
 
 async function init() {
-  firebaseVocabulary = "db1/";
+  const refCloseDialog = document.getElementById('menuDialog');
+  refCloseDialog.style.display = 'none';
+  
   let vocabularyResponse = await loadData(firebaseVocabulary);
 
   let vocabularyArray = Object.keys(vocabularyResponse);
@@ -153,4 +155,25 @@ function selectName(name) {
     refAliaVocabulary.style.backgroundColor = 'lightblue';
     refLiamVocabulary.style.backgroundColor = '#d2d2d2';
   }
+}
+
+function selectBlock(db) {
+  let refBlock1 = document.getElementById('block1');
+  let refBlock2 = document.getElementById('block2');
+
+  if (db === 'block1') {
+    firebaseVocabulary = "db1/";
+    refBlock1.style.backgroundColor = 'lightblue';
+    refBlock2.style.backgroundColor = '#d2d2d2';
+  } else if (db === 'block2') {
+    firebaseVocabulary = "db2/";
+    refBlock2.style.backgroundColor = 'lightblue';
+    refBlock1.style.backgroundColor = '#d2d2d2';
+  }
+}
+
+function showMenu() {
+  location.reload();
+  let refMenuDialog = document.getElementById('menuDialog');
+  refMenuDialog.style.display = 'flex';
 }

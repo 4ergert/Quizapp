@@ -19,7 +19,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Play:wght@400;700&display=swap" rel="stylesheet">
 </head>
 
-<body onload="init()">
+<body>
   <header class="header">
     <h1>Vocabulary Trainer</h1>
   </header>
@@ -65,7 +65,7 @@
           <button class="submit_button" onclick="submitAnswer()">submit</button>
         </section>
         <section class="menu">
-          <button class="menu_button" onclick="renderQuestion()">☰</button>
+          <button class="menu_button" onclick="showMenu()">☰</button>
         </section>
 
       </section>
@@ -77,15 +77,17 @@
     <p>&#169 Julian Aergert</p>
   </footer>
 
-  <dialog id="menuDialog" open>
+  <dialog id="menuDialog">
     <h2>Menu</h2>
     <section class="input_space">
       <label for="name">Name</label>
       <button id="liamVocabulary" onclick="selectName('liam')" type="button">Liam</button>
       <button id="aliaVocabulary" onclick="selectName('alia')" type="button">Alia</button>
       <label for="vocabulary block">Vocabulary</label>
-      <button type="button">Block 1</button>
-      <button type="button">Block 2</button>
+      <button id="block1" onclick="selectBlock('block1')" type="button">Block 1</button>
+      <button id="block2" onclick="selectBlock('block2')" type="button">Block 2</button>
+      <label for="ready">Ready</label>
+      <button id="readyButton" onclick="init()" type="button">Start</button>
     </section>
   </dialog>
 </body>
