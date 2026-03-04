@@ -202,6 +202,17 @@ function addVocabulary() {
   refMenuDialog.innerHTML = getAddVocabularyTemplate();
 }
 
+async function showVocabulary() {
+  let refMenuDialog = document.getElementById('menuDialog');
+  await fetchAndRenderVocabulary();
+
+  let vocabularyListHTML = '<h2>Vocabulary List</h2>';
+  for (let i = 0; i < vocabularyCase.length; i++) {
+    vocabularyListHTML += `<li>${vocabularyCase[i].germenWord} - ${vocabularyCase[i].englishWord}</li>`;
+  }
+  refMenuDialog.innerHTML = vocabularyListHTML;
+}
+
 function addToDatabase() {
   let refGermenWordInput = document.getElementById('germenWordInput');
   let refEnglishWordInput = document.getElementById('englishWordInput');

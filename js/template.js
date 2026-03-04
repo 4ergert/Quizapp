@@ -1,6 +1,6 @@
 function getSelectNameAndBlockTemplate() {
   return `
-  <h2><br> Please select <br> a <span>name</span> and <br> a <span>vocabulary</span> block <br> to start the <br> <span>game</span>!</h2>
+  <h2><br> Please select <br> a <span>name</span> and <br> a <span>vocabulary</span> block <br> to start the <br> game!</h2>
   <section class="input_space">
     <button onclick="showMenu()" type="button">go back</button>
   </section>
