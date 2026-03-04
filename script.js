@@ -1,4 +1,6 @@
-const BASE_URL = 'https://vocabularydb-d1be5-default-rtdb.europe-west1.firebasedatabase.app/';
+const LIAMS_BASE_URL = 'https://vocabularydb-d1be5-default-rtdb.europe-west1.firebasedatabase.app/';
+const ALIAS_BASE_URL = 'https://alias-vocabulary-8f745-default-rtdb.europe-west1.firebasedatabase.app/';
+let BASE_URL = '';
 let rendomIndexNum = 0;
 let invaderHP = 300;
 let spaceShipHP = 1000;
@@ -9,11 +11,17 @@ let vocabularyCase = [];
 let learnedVocabulary = [];
 
 async function init() {
-  const refCloseDialog = document.getElementById('menuDialog');
-  refCloseDialog.style.display = 'none';
-  
-  let vocabularyResponse = await loadData(firebaseVocabulary);
+  const refDialog = document.getElementById('menuDialog');
+  if (BASE_URL == '' || firebaseVocabulary == undefined) {
+    refDialog.innerHTML = getSelectNameAndBlockTemplate();
+    return;
+  }
+  refDialog.style.display = 'none';
+  await fetchAndRenderVocabulary();
+}
 
+async function fetchAndRenderVocabulary() {
+  let vocabularyResponse = await loadData(firebaseVocabulary);
   let vocabularyArray = Object.keys(vocabularyResponse);
   for (let i = 1; i < vocabularyArray.length; i++) {
     vocabularyCase.push(
@@ -24,7 +32,8 @@ async function init() {
     )
   }
   renderQuestion();
-}
+};
+
 
 async function loadData(firebaseVocabulary) {
   let response = await fetch(BASE_URL + firebaseVocabulary + ".json");
@@ -149,11 +158,17 @@ function selectName(name) {
   let refAliaVocabulary = document.getElementById('aliaVocabulary');
 
   if (name === 'liam') {
-    refLiamVocabulary.style.backgroundColor = 'lightblue';
+    BASE_URL = LIAMS_BASE_URL;
+    refLiamVocabulary.style.backgroundColor = '#00ff00';
+    refLiamVocabulary.style.fontWeight = 'bold';
     refAliaVocabulary.style.backgroundColor = '#d2d2d2';
+    refAliaVocabulary.style.fontWeight = 'normal';
   } else if (name === 'alia') {
-    refAliaVocabulary.style.backgroundColor = 'lightblue';
+    BASE_URL = ALIAS_BASE_URL;
+    refAliaVocabulary.style.backgroundColor = '#00ff00';
+    refAliaVocabulary.style.fontWeight = 'bold';
     refLiamVocabulary.style.backgroundColor = '#d2d2d2';
+    refLiamVocabulary.style.fontWeight = 'normal';
   }
 }
 
@@ -163,12 +178,16 @@ function selectBlock(db) {
 
   if (db === 'block1') {
     firebaseVocabulary = "db1/";
-    refBlock1.style.backgroundColor = 'lightblue';
+    refBlock1.style.backgroundColor = '#00ff00';
     refBlock2.style.backgroundColor = '#d2d2d2';
+    refBlock1.style.fontWeight = 'bold';
+    refBlock2.style.fontWeight = 'normal';
   } else if (db === 'block2') {
     firebaseVocabulary = "db2/";
-    refBlock2.style.backgroundColor = 'lightblue';
+    refBlock2.style.backgroundColor = '#00ff00';
     refBlock1.style.backgroundColor = '#d2d2d2';
+    refBlock2.style.fontWeight = 'bold';
+    refBlock1.style.fontWeight = 'normal';
   }
 }
 
@@ -176,4 +195,35 @@ function showMenu() {
   location.reload();
   let refMenuDialog = document.getElementById('menuDialog');
   refMenuDialog.style.display = 'flex';
+}
+
+function addVocabulary() {
+  let refMenuDialog = document.getElementById('menuDialog');
+  refMenuDialog.innerHTML = getAddVocabularyTemplate();
+}
+
+function addToDatabase() {
+  let refGermenWordInput = document.getElementById('germenWordInput');
+  let refEnglishWordInput = document.getElementById('englishWordInput');
+  if (refGermenWordInput.value == '' || refEnglishWordInput.value == '') {
+    alert('Please fill in both fields!');
+    return;
+  }
+  let newVocabulary = {
+    germenWord: refGermenWordInput.value,
+    englishWord: refEnglishWordInput.value
+  };
+  fetch(BASE_URL + firebaseVocabulary + ".json", {
+    method: 'POST',
+    body: JSON.stringify(newVocabulary)
+  })
+    .then(response => response.json())
+    .then(_data => {
+      alert('Vocabulary added successfully!');
+      showMenu();
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Failed to add vocabulary.');
+    });
 }

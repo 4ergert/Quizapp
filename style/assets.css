@@ -39,24 +39,46 @@
   gap: 16px;
   border-radius: 16px;
   background-color: #119893;
-  width: 200px;
-  height: 300px;
+  width: 250px;
+  height: 350px;
+  overflow: scroll;
+  text-align: center;
 }
 
 .input_space {
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 8px;
 }
 
 .input_space button{
-  width: 150px;
+  width: 170px;
+  padding: 4px 16px;
+  border-radius: 8px;
   font-size: 16px;
-  font-weight: 500;
   background: #d2d2d2;
+}
+
+.input_space button:hover {
+  cursor: pointer;
+  font-weight: 550;
 }
 
 .input_space label{
   font-size: 20px;
   font-weight: 550;
+}
+
+#menuDialog span {
+  font-size: 24px;
+  font-weight: 550;
+  color: #00ff51;
+}
+
+.input_space input {
+  width: 150px;
+  padding: 4px 16px;
+  border-radius: 8px;
+  font-size: 16px;
 }
