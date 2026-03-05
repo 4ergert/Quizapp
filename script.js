@@ -234,16 +234,11 @@ function addVocabulary() {
 function verifyAddVocabularyPassword() {
   let refMenuDialog = document.getElementById('menuDialog');
   let refPasswordInput = document.getElementById('addVocabularyPassword');
-
-  if (!refPasswordInput) {
-    return;
-  }
-
+  if (!refPasswordInput) return;
   if (refPasswordInput.value !== ADD_VOCAB_PASSWORD) {
     refMenuDialog.innerHTML = getWrongPasswordTemplate();
     return;
   }
-
   refMenuDialog.innerHTML = getAddVocabularyTemplate();
   passwordWasCorrect = true;
 }
@@ -262,16 +257,12 @@ async function addToDatabase() {
     germenWord: refGermenWordInput.value,
     englishWord: refEnglishWordInput.value
   };
+  tryAndCatchToDatabase(newVocabulary, refMenuDialog, refGermenWordInput, refEnglishWordInput);
+}
 
+async function tryAndCatchToDatabase(newVocabulary, refMenuDialog, refGermenWordInput, refEnglishWordInput) {
   try {
-    const response = await fetch(BASE_URL + firebaseVocabulary + ".json", {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(newVocabulary)
-    });
-    const data = await response.json();
+    await fetchToFirebase(newVocabulary);
     refMenuDialog.innerHTML = getVocabularyAddedSuccessfullyTemplate();
     refGermenWordInput.value = '';
     refEnglishWordInput.value = '';
@@ -282,4 +273,14 @@ async function addToDatabase() {
     console.error('Error:', error);
     refMenuDialog.innerHTML = getVocabularyAddFailedTemplate();
   }
+}
+
+async function fetchToFirebase(newVocabulary) {
+  await fetch(BASE_URL + firebaseVocabulary + ".json", {
+    method: 'POST',
+    body: JSON.stringify(newVocabulary),
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
 }
