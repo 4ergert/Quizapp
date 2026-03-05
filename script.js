@@ -1,5 +1,6 @@
 const LIAMS_BASE_URL = 'https://vocabularydb-d1be5-default-rtdb.europe-west1.firebasedatabase.app/';
 const ALIAS_BASE_URL = 'https://alias-vocabulary-8f745-default-rtdb.europe-west1.firebasedatabase.app/';
+const ADD_VOCAB_PASSWORD = 'alpha';
 let BASE_URL = '';
 let rendomIndexNum = 0;
 let invaderHP = 300;
@@ -201,21 +202,42 @@ function showMenu() {
 
 async function showVocabulary() {
   let refMenuDialog = document.getElementById('menuDialog');
+  if (BASE_URL == '' || firebaseVocabulary == undefined) {
+    refMenuDialog.innerHTML = getSelectNameAndBlockTemplateToShowVocabulary();
+    return;
+  }
   await fetchAndRenderVocabulary();
-
   let vocabularyListHTML = '<h2>Vocabulary List</h2>';
   for (let i = 0; i < vocabularyCase.length; i++) {
-    vocabularyListHTML += `<li>${vocabularyCase[i].germenWord} - ${vocabularyCase[i].englishWord}</li>`;
+    vocabularyListHTML += `${vocabularyCase[i].germenWord} - ${vocabularyCase[i].englishWord}<br>`;
   }
   refMenuDialog.innerHTML = vocabularyListHTML;
+  refMenuDialog.innerHTML += getGoBackButtonTemplate();
 }
 
 function addVocabulary() {
   let refMenuDialog = document.getElementById('menuDialog');
+
   if (BASE_URL == '' || firebaseVocabulary == undefined) {
     refMenuDialog.innerHTML = getSelectNameAndBlockTemplateForAdd();
     return;
   }
+  refMenuDialog.innerHTML = getAddVocabularyPasswordTemplate();
+}
+
+function verifyAddVocabularyPassword() {
+  let refMenuDialog = document.getElementById('menuDialog');
+  let refPasswordInput = document.getElementById('addVocabularyPassword');
+
+  if (!refPasswordInput) {
+    return;
+  }
+
+  if (refPasswordInput.value !== ADD_VOCAB_PASSWORD) {
+    refMenuDialog.innerHTML = getWrongPasswordTemplate();
+    return;
+  }
+
   refMenuDialog.innerHTML = getAddVocabularyTemplate();
 }
 
