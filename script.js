@@ -152,9 +152,26 @@ function winSeq(refMessage) {
   let refGermanQuestion = document.getElementById('germanQuestion');
   let refSubmit = document.getElementById('submitSection');
 
+  explodeInvader();
   refMessage.innerHTML = 'You Win!!!';
   refGermanQuestion.innerHTML = '!!!Hervoragend!!! <br> Push "Strg + R" to restart your training';
   refSubmit.style.display = 'none'
+}
+
+function explodeInvader() {
+  const refInvader = document.querySelector('.invader');
+  const refInvaderImg = document.querySelector('.invader img');
+
+  if (!refInvader || !refInvaderImg) {
+    return;
+  }
+
+  refInvader.classList.add('invader_explode');
+  refInvaderImg.classList.add('invader_explode_img');
+
+  setTimeout(() => {
+    refInvaderImg.style.visibility = 'hidden';
+  }, 700);
 }
 
 function selectName(name) {
@@ -257,7 +274,17 @@ async function addToDatabase() {
     germenWord: refGermenWordInput.value,
     englishWord: refEnglishWordInput.value
   };
-  tryAndCatchToDatabase(newVocabulary, refMenuDialog, refGermenWordInput, refEnglishWordInput);
+
+  const canSaveVocabulary = await confirmSpellingWithGoogle(
+    newVocabulary.germenWord,
+    newVocabulary.englishWord
+  );
+
+  if (!canSaveVocabulary) {
+    return;
+  }
+
+  await tryAndCatchToDatabase(newVocabulary, refMenuDialog, refGermenWordInput, refEnglishWordInput);
 }
 
 async function tryAndCatchToDatabase(newVocabulary, refMenuDialog, refGermenWordInput, refEnglishWordInput) {
@@ -275,6 +302,107 @@ async function tryAndCatchToDatabase(newVocabulary, refMenuDialog, refGermenWord
   }
 }
 
+async function confirmSpellingWithGoogle(germanWord, englishWord) {
+  const germanCheck = await checkGoogleSpelling(germanWord, 'de');
+  const englishCheck = await checkGoogleSpelling(englishWord, 'en');
+  const warningLines = [];
+
+  if (!germanCheck.isLikelyCorrect && germanCheck.suggestion) {
+    warningLines.push(`Deutsch: "${germanWord}" -> Vorschlag: "${germanCheck.suggestion}"`);
+  }
+
+  if (!englishCheck.isLikelyCorrect && englishCheck.suggestion) {
+    warningLines.push(`English: "${englishWord}" -> suggestion: "${englishCheck.suggestion}"`);
+  }
+
+  if (warningLines.length === 0) {
+    return true;
+  }
+
+  return confirm(
+    `Moeglicher Rechtschreibfehler gefunden:\n\n${warningLines.join('\n')}\n\nTrotzdem speichern?`
+  );
+}
+
+async function checkGoogleSpelling(word, languageCode) {
+  const cleanedWord = word.trim();
+
+  if (cleanedWord.length < 2) {
+    return { isLikelyCorrect: true, suggestion: '' };
+  }
+
+  try {
+    const suggestions = await fetchGoogleSuggestionsJsonp(cleanedWord, languageCode);
+
+    if (suggestions.length === 0) {
+      return { isLikelyCorrect: true, suggestion: '' };
+    }
+
+    const normalizedWord = cleanedWord.toLowerCase();
+    const hasExactMatch = suggestions.some((entry) => normalizeSuggestion(entry) === normalizedWord);
+    const hasCompletionMatch = suggestions.some((entry) => {
+      const normalizedSuggestion = normalizeSuggestion(entry);
+      return (
+        normalizedSuggestion.startsWith(`${normalizedWord} `) ||
+        normalizedSuggestion.startsWith(`${normalizedWord}-`) ||
+        normalizedSuggestion.startsWith(`${normalizedWord}'`)
+      );
+    });
+
+    const firstSuggestion = normalizeSuggestion(suggestions[0]);
+    const isVeryClose = levenshteinDistance(normalizedWord, firstSuggestion) <= 1;
+
+    if (hasExactMatch || hasCompletionMatch || isVeryClose) {
+      return { isLikelyCorrect: true, suggestion: suggestions[0] };
+    }
+
+    return { isLikelyCorrect: false, suggestion: suggestions[0] };
+  } catch (error) {
+    console.warn('Google spelling check failed:', error);
+    return {
+      isLikelyCorrect: false,
+      suggestion: 'Google-Pruefung nicht erreichbar'
+    };
+  }
+}
+
+function fetchGoogleSuggestionsJsonp(query, languageCode) {
+  return new Promise((resolve, reject) => {
+    const callbackName = `googleSuggest_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
+    const script = document.createElement('script');
+    const timeoutMs = 4000;
+
+    const cleanup = () => {
+      if (script.parentNode) {
+        script.parentNode.removeChild(script);
+      }
+      delete window[callbackName];
+    };
+
+    const timeoutId = setTimeout(() => {
+      cleanup();
+      reject(new Error('Google JSONP timeout'));
+    }, timeoutMs);
+
+    window[callbackName] = (payload) => {
+      clearTimeout(timeoutId);
+      cleanup();
+
+      const suggestions = Array.isArray(payload?.[1]) ? payload[1] : [];
+      resolve(suggestions);
+    };
+
+    script.onerror = () => {
+      clearTimeout(timeoutId);
+      cleanup();
+      reject(new Error('Google JSONP request failed'));
+    };
+
+    script.src = `https://suggestqueries.google.com/complete/search?client=chrome&hl=${languageCode}&q=${encodeURIComponent(query)}&callback=${callbackName}`;
+    document.head.appendChild(script);
+  });
+}
+
 async function fetchToFirebase(newVocabulary) {
   await fetch(BASE_URL + firebaseVocabulary + ".json", {
     method: 'POST',
@@ -283,4 +411,38 @@ async function fetchToFirebase(newVocabulary) {
       'Content-Type': 'application/json'
     }
   });
+}
+
+function normalizeSuggestion(value) {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/[.,!?;:]/g, '');
+}
+
+function levenshteinDistance(a, b) {
+  const rows = a.length + 1;
+  const cols = b.length + 1;
+  const matrix = Array.from({ length: rows }, () => Array(cols).fill(0));
+
+  for (let i = 0; i < rows; i++) {
+    matrix[i][0] = i;
+  }
+
+  for (let j = 0; j < cols; j++) {
+    matrix[0][j] = j;
+  }
+
+  for (let i = 1; i < rows; i++) {
+    for (let j = 1; j < cols; j++) {
+      const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+      matrix[i][j] = Math.min(
+        matrix[i - 1][j] + 1,
+        matrix[i][j - 1] + 1,
+        matrix[i - 1][j - 1] + cost
+      );
+    }
+  }
+
+  return matrix[a.length][b.length];
 }

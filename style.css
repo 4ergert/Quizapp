@@ -118,6 +118,15 @@
   text-shadow: 1px 2px #ff0095;
 }
 
+.invader_explode {
+  animation: none;
+}
+
+.invader_explode_img {
+  transform-origin: center;
+  animation: invaderExplode 1.3s ease-out forwards;
+}
+
 @keyframes invaderMoveSide {
   0% {
     transform: translateX(-9px);
@@ -125,6 +134,26 @@
 
   100% {
     transform: translateX(9px);
+  }
+}
+
+@keyframes invaderExplode {
+  0% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+    filter: brightness(1);
+  }
+
+  40% {
+    transform: scale(1.35) rotate(6deg);
+    opacity: 1;
+    filter: brightness(1.9);
+  }
+
+  100% {
+    transform: scale(0.08) rotate(300deg);
+    opacity: 0;
+    filter: brightness(2.2);
   }
 }
 
