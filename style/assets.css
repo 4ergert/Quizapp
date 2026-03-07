@@ -129,3 +129,41 @@
   border-radius: 8px;
   font-size: 16px;
 }
+
+.block-stars {
+  display: inline-flex;
+  gap: 2px;
+  align-items: center;
+  justify-content: center;
+}
+
+.block-star {
+  display: inline-block;
+  transform-origin: center;
+  color: #00b84d;
+  text-shadow: 0 0 4px rgba(0, 184, 77, 0.6);
+  animation: blockStarSpin 6s linear infinite, blockStarColorShift 2.8s ease-in-out infinite alternate;
+  animation-delay: calc(var(--star-index) * 140ms);
+}
+
+@keyframes blockStarSpin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes blockStarColorShift {
+  0% {
+    color: #04ff00;
+    text-shadow: 0 0 4px rgba(0, 184, 77, 0.6);
+  }
+
+  100% {
+    color: #ee00de;
+    text-shadow: 0 0 7px rgba(141, 51, 204, 0.7);
+  }
+}

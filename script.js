@@ -1,18 +1,32 @@
 const LIAMS_BASE_URL = 'https://vocabularydb-d1be5-default-rtdb.europe-west1.firebasedatabase.app/';
 const ALIAS_BASE_URL = 'https://alias-vocabulary-8f745-default-rtdb.europe-west1.firebasedatabase.app/';
 const ADD_VOCAB_PASSWORD = 'alpha';
+const LAST_USED_NAME_STORAGE_KEY = 'lastUsedVocabularyName';
+const LAST_USED_BLOCK_STORAGE_KEY_PREFIX = 'lastUsedVocabularyBlock';
 let passwordWasCorrect = false;
 let BASE_URL = '';
+let selectedName = 'liam';
 let rendomIndexNum = 0;
 let invaderHP = 300;
 let spaceShipHP = 1000;
 let spaceShipLVL = 1;
 let spaceShipLVLup = 200;
 let firebaseVocabulary;
+let vocabularyGroupWinCounts = {};
 let vocabularyCase = [];
 let learnedVocabulary = [];
 
-window.addEventListener('DOMContentLoaded', setupExclusiveDropdownGroups);
+window.addEventListener('DOMContentLoaded', async () => {
+  setupExclusiveDropdownGroups();
+  const lastUsedName = localStorage.getItem(LAST_USED_NAME_STORAGE_KEY);
+
+  if (lastUsedName === 'liam' || lastUsedName === 'alia') {
+    await selectName(lastUsedName, { moveToNextGroup: true });
+    return;
+  }
+
+  await selectName('liam', { moveToNextGroup: false });
+});
 
 function setupExclusiveDropdownGroups() {
   const dropdownGroups = document.querySelectorAll('.dropdown_group');
@@ -57,14 +71,26 @@ async function init() {
 }
 
 async function fetchAndRenderVocabulary() {
+  vocabularyCase = [];
   let vocabularyResponse = await loadData(firebaseVocabulary);
+
+  if (!vocabularyResponse || typeof vocabularyResponse !== 'object') {
+    await renderQuestion();
+    return vocabularyCase;
+  }
 
   let vocabularyArray = Object.keys(vocabularyResponse);
   for (let i = 0; i < vocabularyArray.length; i++) {
+    const currentVocabulary = vocabularyResponse[vocabularyArray[i]];
+
+    if (!currentVocabulary?.germenWord || !currentVocabulary?.englishWord) {
+      continue;
+    }
+
     vocabularyCase.push(
       {
-        germenWord: vocabularyResponse[vocabularyArray[i]].germenWord,
-        englishWord: vocabularyResponse[vocabularyArray[i]].englishWord
+        germenWord: currentVocabulary.germenWord,
+        englishWord: currentVocabulary.englishWord
       }
     )
   }
@@ -186,6 +212,9 @@ function winSeq(refMessage) {
   let refGermanQuestion = document.getElementById('germanQuestion');
   let refSubmit = document.getElementById('submitSection');
 
+  incrementCurrentBlockWinCount().catch((error) => {
+    console.error('Win-Count konnte nicht gespeichert werden:', error);
+  });
   explodeInvader();
   refMessage.innerHTML = 'You Win!!!';
   refGermanQuestion.innerHTML = '!!!Hervoragend!!! <br> Push "Strg + R" to restart your training';
@@ -208,12 +237,13 @@ function explodeInvader() {
   }, 700);
 }
 
-function selectName(name) {
+async function selectName(name, options = { moveToNextGroup: true }) {
   let refLiamVocabulary = document.getElementById('liamVocabulary');
   let refAliaVocabulary = document.getElementById('aliaVocabulary');
   let refSummaryName = document.getElementById('summary_name');
 
   if (name === 'liam') {
+    selectedName = 'liam';
     BASE_URL = LIAMS_BASE_URL;
     refSummaryName.innerHTML = 'Liam';
     refLiamVocabulary.style.backgroundColor = '#00ff00';
@@ -221,6 +251,7 @@ function selectName(name) {
     refAliaVocabulary.style.backgroundColor = '#d2d2d2';
     refAliaVocabulary.style.fontWeight = 'normal';
   } else if (name === 'alia') {
+    selectedName = 'alia';
     BASE_URL = ALIAS_BASE_URL;
     let refSummaryName = document.getElementById('summary_name');
     refSummaryName.innerHTML = 'Alia';
@@ -228,33 +259,186 @@ function selectName(name) {
     refAliaVocabulary.style.fontWeight = 'bold';
     refLiamVocabulary.style.backgroundColor = '#d2d2d2';
     refLiamVocabulary.style.fontWeight = 'normal';
+  } else {
+    return;
   }
 
-  goToNextDropdownGroup(0);
+  localStorage.setItem(LAST_USED_NAME_STORAGE_KEY, selectedName);
+
+  await refreshVocabularyGroupButtons();
+
+  if (options.moveToNextGroup) {
+    goToNextDropdownGroup(0);
+  }
 }
 
 function selectBlock(db) {
-  let refBlock1 = document.getElementById('block1');
-  let refBlock2 = document.getElementById('block2');
   let refSummaryBlock = document.getElementById('summary_vocabulary');
 
-  if (db === 'block1') {
-    firebaseVocabulary = "db1/";
-    refSummaryBlock.innerHTML = 'Block 1';
-    refBlock1.style.backgroundColor = '#00ff00';
-    refBlock2.style.backgroundColor = '#d2d2d2';
-    refBlock1.style.fontWeight = 'bold';
-    refBlock2.style.fontWeight = 'normal';
-  } else if (db === 'block2') {
-    firebaseVocabulary = "db2/";
-    refSummaryBlock.innerHTML = 'Block 2';
-    refBlock2.style.backgroundColor = '#00ff00';
-    refBlock1.style.backgroundColor = '#d2d2d2';
-    refBlock2.style.fontWeight = 'bold';
-    refBlock1.style.fontWeight = 'normal';
+  let dbKey = db;
+  if (/^block\d+$/i.test(db)) {
+    dbKey = `db${db.replace(/\D/g, '')}`;
   }
 
+  firebaseVocabulary = `${dbKey}/`;
+  refSummaryBlock.innerHTML = getBlockLabel(dbKey);
+  highlightSelectedBlockButton(dbKey);
+  localStorage.setItem(getLastUsedBlockStorageKey(), dbKey);
+
   goToNextDropdownGroup(1);
+}
+
+async function refreshVocabularyGroupButtons() {
+  const refGroupButtons = document.getElementById('vocabularyGroupButtons');
+  if (!refGroupButtons || BASE_URL === '') {
+    return;
+  }
+
+  try {
+    const dbKeys = await fetchVocabularyDbKeysAndWinCounts();
+
+    if (dbKeys.length === 0) {
+      refGroupButtons.innerHTML = '<p>Noch kein Block vorhanden</p>';
+      return;
+    }
+
+    refGroupButtons.innerHTML = dbKeys
+      .map((dbKey) => `<button data-block-key="${dbKey}" onclick="selectBlock('${dbKey}')" type="button">${getBlockButtonContent(dbKey)}</button>`)
+      .join('');
+
+    const savedBlockKey = localStorage.getItem(getLastUsedBlockStorageKey());
+    if (savedBlockKey && dbKeys.includes(savedBlockKey)) {
+      firebaseVocabulary = `${savedBlockKey}/`;
+      document.getElementById('summary_vocabulary').innerHTML = getBlockLabel(savedBlockKey);
+    }
+
+    const selectedDbKey = firebaseVocabulary?.replace('/', '');
+    if (selectedDbKey) {
+      highlightSelectedBlockButton(selectedDbKey);
+    }
+  } catch (error) {
+    console.error('Vocabulary blocks konnten nicht geladen werden:', error);
+  }
+}
+
+async function fetchVocabularyDbKeysAndWinCounts() {
+  const response = await fetch(`${BASE_URL}.json`);
+  const allData = await response.json();
+  const allKeys = Object.keys(allData || {});
+  vocabularyGroupWinCounts = {};
+
+  allKeys.forEach((key) => {
+    if (!/^db\d+$/.test(key)) {
+      return;
+    }
+
+    const winCount = Number(allData?.[key]?._meta?.winCount || 0);
+    vocabularyGroupWinCounts[key] = Number.isFinite(winCount) && winCount > 0 ? winCount : 0;
+  });
+
+  return allKeys
+    .filter((key) => /^db\d+$/.test(key))
+    .sort((a, b) => Number(a.replace('db', '')) - Number(b.replace('db', '')));
+}
+
+function getBlockLabel(dbKey) {
+  return `Block ${dbKey.replace('db', '')}`;
+}
+
+function getLastUsedBlockStorageKey() {
+  return `${LAST_USED_BLOCK_STORAGE_KEY_PREFIX}_${selectedName}`;
+}
+
+function getBlockButtonContent(dbKey) {
+  const starCount = getBlockStarCount(dbKey);
+  const starsHtml = Array.from({ length: starCount }, (_, index) => `<span class="block-star" style="--star-index:${index};">★</span>`).join('');
+  const starLine = starCount > 0 ? `<br><span class="block-stars" aria-label="${starCount} Sterne">${starsHtml}</span>` : '';
+  return `${getBlockLabel(dbKey)}${starLine}`;
+}
+
+function getBlockStarCount(dbKey) {
+  const starCount = Number(vocabularyGroupWinCounts[dbKey] || 0);
+  return Number.isFinite(starCount) && starCount > 0 ? starCount : 0;
+}
+
+async function incrementCurrentBlockWinCount() {
+  const selectedDbKey = firebaseVocabulary?.replace('/', '');
+
+  if (!selectedDbKey) {
+    return;
+  }
+
+  const currentCountResponse = await fetch(`${BASE_URL}${selectedDbKey}/_meta/winCount.json`);
+  const currentCountData = await currentCountResponse.json();
+  const currentCount = Number(currentCountData || 0);
+  const nextCount = (Number.isFinite(currentCount) ? currentCount : 0) + 1;
+
+  await fetch(`${BASE_URL}${selectedDbKey}/_meta/winCount.json`, {
+    method: 'PUT',
+    body: JSON.stringify(nextCount),
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
+
+  vocabularyGroupWinCounts[selectedDbKey] = nextCount;
+
+  const currentButton = document.querySelector(`#vocabularyGroupButtons button[data-block-key="${selectedDbKey}"]`);
+  if (currentButton) {
+    currentButton.innerHTML = getBlockButtonContent(selectedDbKey);
+  }
+}
+
+function highlightSelectedBlockButton(selectedDbKey) {
+  const allBlockButtons = document.querySelectorAll('#vocabularyGroupButtons button[data-block-key]');
+  allBlockButtons.forEach((button) => {
+    const isSelected = button.dataset.blockKey === selectedDbKey;
+    button.style.backgroundColor = isSelected ? '#00ff00' : '#d2d2d2';
+    button.style.fontWeight = isSelected ? 'bold' : 'normal';
+  });
+}
+
+async function createNextVocabularyBlock() {
+  if (BASE_URL === '') {
+    alert('Bitte zuerst Liam oder Alia waehlen.');
+    return;
+  }
+
+  try {
+    const dbKeys = await fetchVocabularyDbKeysAndWinCounts();
+    const maxIndex = dbKeys.reduce((max, dbKey) => {
+      const currentIndex = Number(dbKey.replace('db', ''));
+      return currentIndex > max ? currentIndex : max;
+    }, 0);
+
+    const nextDbKey = `db${maxIndex + 1}`;
+    const initialBlockPayload = {
+      _meta: {
+        createdAt: new Date().toISOString(),
+        createdBy: `add-block-button-${selectedName}`,
+        winCount: 0
+      }
+    };
+
+    const createResponse = await fetch(`${BASE_URL}${nextDbKey}.json`, {
+      method: 'PUT',
+      body: JSON.stringify(initialBlockPayload),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!createResponse.ok) {
+      const errorBody = await createResponse.text();
+      throw new Error(`HTTP ${createResponse.status}: ${errorBody}`);
+    }
+
+    await refreshVocabularyGroupButtons();
+    selectBlock(nextDbKey);
+  } catch (error) {
+    console.error('Neuer Firebase-Block konnte nicht erstellt werden:', error);
+    alert('Fehler beim Erstellen von db[n] in Firebase.');
+  }
 }
 
 function showMenu() {

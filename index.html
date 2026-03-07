@@ -92,8 +92,11 @@
       <details class="dropdown_group">
         <summary id="summary_vocabulary">Vocabulary</summary>
         <section class="dropdown_content">
-          <button id="block1" onclick="selectBlock('block1')" type="button">Block 1</button>
-          <button id="block2" onclick="selectBlock('block2')" type="button">Block 2</button>
+          <section id="vocabularyGroupButtons" class="dropdown_content">
+            <button id="block1" data-block-key="db1" onclick="selectBlock('db1')" type="button">Block 1</button>
+            <button id="block2" data-block-key="db2" onclick="selectBlock('db2')" type="button">Block 2</button>
+          </section>
+          <button id="addBlockButton" onclick="createNextVocabularyBlock()" type="button">+ Add Block</button>
         </section>
       </details>
       <details class="dropdown_group">
