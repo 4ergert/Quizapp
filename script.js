@@ -3,6 +3,8 @@ const ALIAS_BASE_URL = 'https://alias-vocabulary-8f745-default-rtdb.europe-west1
 const ADD_VOCAB_PASSWORD = 'alpha';
 const LAST_USED_NAME_STORAGE_KEY = 'lastUsedVocabularyName';
 const LAST_USED_BLOCK_STORAGE_KEY_PREFIX = 'lastUsedVocabularyBlock';
+const ENTERED_VOCABULARY_COUNT_STORAGE_KEY = 'enteredVocabularyCount';
+const ENTERED_VOCABULARY_COUNT_TTL_MS = 24 * 60 * 60 * 1000;
 let passwordWasCorrect = false;
 let BASE_URL = '';
 let selectedName = 'liam';
@@ -15,9 +17,12 @@ let firebaseVocabulary;
 let vocabularyGroupWinCounts = {};
 let vocabularyCase = [];
 let learnedVocabulary = [];
+let enteredVocabularyCount = 0;
 
 window.addEventListener('DOMContentLoaded', async () => {
   setupExclusiveDropdownGroups();
+  initializeEnteredVocabularyCount();
+  renderEnteredVocabularyCount();
   const lastUsedName = localStorage.getItem(LAST_USED_NAME_STORAGE_KEY);
 
   if (lastUsedName === 'liam' || lastUsedName === 'alia') {
@@ -127,15 +132,68 @@ async function renderQuestion() {
   renderHP()
 }
 
+function renderEnteredVocabularyCount() {
+  const refEnteredVocabularyCount = document.getElementById('enteredVocabularyCount');
+  if (!refEnteredVocabularyCount) {
+    return;
+  }
+
+  refEnteredVocabularyCount.innerHTML = enteredVocabularyCount;
+}
+
+function initializeEnteredVocabularyCount() {
+  const savedData = localStorage.getItem(ENTERED_VOCABULARY_COUNT_STORAGE_KEY);
+
+  if (!savedData) {
+    enteredVocabularyCount = 0;
+    return;
+  }
+
+  try {
+    const parsedData = JSON.parse(savedData);
+    const savedCount = Number(parsedData?.count || 0);
+    const expiresAt = Number(parsedData?.expiresAt || 0);
+
+    if (expiresAt > Date.now()) {
+      enteredVocabularyCount = Number.isFinite(savedCount) && savedCount > 0 ? savedCount : 0;
+      return;
+    }
+  } catch (error) {
+    console.warn('Saved entered vocabulary counter is invalid and will be reset:', error);
+  }
+
+  enteredVocabularyCount = 0;
+  localStorage.removeItem(ENTERED_VOCABULARY_COUNT_STORAGE_KEY);
+}
+
+function persistEnteredVocabularyCount() {
+  localStorage.setItem(
+    ENTERED_VOCABULARY_COUNT_STORAGE_KEY,
+    JSON.stringify({
+      count: enteredVocabularyCount,
+      expiresAt: Date.now() + ENTERED_VOCABULARY_COUNT_TTL_MS
+    })
+  );
+}
+
 function submitAnswer() {
   let refEnglishWord = document.getElementById('englishWord');
   let refShipShoot = document.getElementById('spaceShipShoot');
   let refInvaderShoot = document.getElementById('invaderShoot');
   let refMessage = document.getElementById('message');
   let refRightAnswer = document.getElementById('rightAnswer');
+  const submittedWord = refEnglishWord.value.trim();
+
+  if (submittedWord === '') {
+    return;
+  }
+
+  enteredVocabularyCount++;
+  persistEnteredVocabularyCount();
+  renderEnteredVocabularyCount();
 
   refMessage.innerHTML = '';
-  if (refEnglishWord.value == vocabularyCase[rendomIndexNum].englishWord) {
+  if (submittedWord == vocabularyCase[rendomIndexNum].englishWord) {
     spaceShipShoot(refShipShoot, refMessage, refRightAnswer);
     learnedVocabulary.push(vocabularyCase[rendomIndexNum]);
     vocabularyCase.splice(rendomIndexNum, 1)
