@@ -79,17 +79,23 @@ async function fetchAndRenderVocabulary() {
   vocabularyCase = [];
   let vocabularyResponse = await loadData(firebaseVocabulary);
 
-  if (!vocabularyResponse || typeof vocabularyResponse !== 'object') {
+  if (!vocabularyResponse || typeof vocabularyResponse !== 'object') {//Prueft, ob die Antwort valide ist. Falls nicht, wird eine leere Vokabelliste geladen, damit das Spiel trotzdem spielbar ist - so koennen z.B. neue Blöcke angelegt werden, ohne dass sie vorher mit Vokabeln gefüllt werden müssen.
     await renderQuestion();
     return vocabularyCase;
   }
 
+  renderEnteredVocabulary(vocabularyResponse);
+  await renderQuestion();
+  return vocabularyCase;
+};
+
+function renderEnteredVocabulary(vocabularyResponse) {
   let vocabularyArray = Object.keys(vocabularyResponse);
   for (let i = 0; i < vocabularyArray.length; i++) {
     const currentVocabulary = vocabularyResponse[vocabularyArray[i]];
 
-    if (!currentVocabulary?.germenWord || !currentVocabulary?.englishWord) {
-      continue;
+    if (!currentVocabulary?.germenWord || !currentVocabulary?.englishWord) {//Prueft, ob die Vokabel die noetigen Eigenschaften hat, um im Spiel genutzt zu werden. Falls nicht, wird sie einfach uebersprungen. So koennen auch unvollstaendige Vokabeln in der Datenbank existieren, ohne dass das Spiel beeintraechtigt wird.
+      continue;//Die Vokabel wird nicht in das Spiel geladen, aber auch nicht aus der Datenbank geloescht - so kann sie z.B. spaeter einfach vervollstaendigt werden, ohne dass sie neu angelegt werden muss.
     }
 
     vocabularyCase.push(
@@ -99,10 +105,7 @@ async function fetchAndRenderVocabulary() {
       }
     )
   }
-  await renderQuestion();
-  return vocabularyCase;
-};
-
+}
 
 async function loadData(firebaseVocabulary) {
   let response = await fetch(BASE_URL + firebaseVocabulary + ".json");
@@ -141,7 +144,7 @@ function renderEnteredVocabularyCount() {
   refEnteredVocabularyCount.innerHTML = enteredVocabularyCount;
 }
 
-function initializeEnteredVocabularyCount() {
+function initializeEnteredVocabularyCount() {//Diese Funktion liest den gespeicherten Counter aus dem localStorage aus und setzt die Variable enteredVocabularyCount entsprechend. Wenn die gespeicherten Daten ungültig oder abgelaufen sind, wird der Counter zurückgesetzt.
   const savedData = localStorage.getItem(ENTERED_VOCABULARY_COUNT_STORAGE_KEY);
 
   if (!savedData) {
@@ -182,16 +185,17 @@ function submitAnswer() {
   let refInvaderShoot = document.getElementById('invaderShoot');
   let refMessage = document.getElementById('message');
   let refRightAnswer = document.getElementById('rightAnswer');
+
   const submittedWord = refEnglishWord.value.trim();
-
-  if (submittedWord === '') {
-    return;
-  }
-
+  if (submittedWord === '') return;
   enteredVocabularyCount++;
   persistEnteredVocabularyCount();
   renderEnteredVocabularyCount();
+  rightOrWrongAnswerAnimation(submittedWord, refShipShoot, refInvaderShoot, refMessage, refRightAnswer);
+  refEnglishWord.value = '';
+}
 
+function rightOrWrongAnswerAnimation(submittedWord, refShipShoot, refInvaderShoot, refMessage, refRightAnswer) {
   refMessage.innerHTML = '';
   if (submittedWord == vocabularyCase[rendomIndexNum].englishWord) {
     spaceShipShoot(refShipShoot, refMessage, refRightAnswer);
@@ -200,7 +204,6 @@ function submitAnswer() {
   } else {
     invaderShoot(refInvaderShoot, refMessage, rendomIndexNum, refRightAnswer);
   }
-  refEnglishWord.value = '';
 }
 
 function spaceShipShoot(shipShoot, refMessage, refRightAnswer) {
@@ -283,16 +286,13 @@ function explodeInvader() {
   const refInvader = document.querySelector('.invader');
   const refInvaderImg = document.querySelector('.invader img');
 
-  if (!refInvader || !refInvaderImg) {
-    return;
-  }
-
+  if (!refInvader || !refInvaderImg) return;
   refInvader.classList.add('invader_explode');
   refInvaderImg.classList.add('invader_explode_img');
 
   setTimeout(() => {
     refInvaderImg.style.visibility = 'hidden';
-  }, 700);
+  }, 1000);
 }
 
 async function selectName(name, options = { moveToNextGroup: true }) {
